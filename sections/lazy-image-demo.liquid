@@ -1,0 +1,381 @@
+{% liquid
+  assign image_count = section.settings.image_count | default: 10
+  assign image_width = section.settings.image_width | default: 1200
+  assign show_numbers = section.settings.show_numbers
+  assign root_margin = section.settings.root_margin | default: '50px'
+%}
+
+<div class="lazy-image-demo" id="lazy-image-demo-{{ section.id }}">
+  {% if section.settings.heading != blank %}
+    <div class="lazy-image-demo__header">
+      <h2 class="lazy-image-demo__title">{{ section.settings.heading }}</h2>
+      {% if section.settings.description != blank %}
+        <p class="lazy-image-demo__description">{{ section.settings.description }}</p>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <div class="lazy-image-demo__stats">
+    <div class="lazy-image-demo__stat">
+      <span class="lazy-image-demo__stat-label">Всего изображений:</span>
+      <span class="lazy-image-demo__stat-value" data-total>{{ image_count }}</span>
+    </div>
+    <div class="lazy-image-demo__stat">
+      <span class="lazy-image-demo__stat-label">Загружено:</span>
+      <span class="lazy-image-demo__stat-value" data-loaded>0</span>
+    </div>
+    <div class="lazy-image-demo__stat">
+      <span class="lazy-image-demo__stat-label">В зоне видимости:</span>
+      <span class="lazy-image-demo__stat-value" data-visible>0</span>
+    </div>
+  </div>
+
+  <div class="lazy-image-demo__container">
+    <div class="lazy-image-demo__grid">
+      {% for i in (1..image_count) %}
+        {% liquid
+          assign image_index = i | modulo: 20
+          if image_index == 0
+            assign image_index = 20
+          endif
+          assign placeholder_width = image_width
+          assign placeholder_height = image_width | times: 1.5 | round
+        %}
+
+        <div class="lazy-image-demo__item" data-index="{{ i }}">
+          {% if show_numbers %}
+            <div class="lazy-image-demo__badge">
+              <span class="lazy-image-demo__badge-text">{{ i }}</span>
+            </div>
+          {% endif %}
+
+          <lazy-image
+            class="lazy-image-demo__image"
+            src="https://picsum.photos/seed/{{ image_index }}/{{ placeholder_width }}/{{ placeholder_height }}"
+            alt="Lazy loaded image {{ i }}"
+            width="{{ placeholder_width }}"
+            height="{{ placeholder_height }}"
+            root-margin="{{ root_margin }}"
+            data-lazy-index="{{ i }}"
+          ></lazy-image>
+
+          <div class="lazy-image-demo__info">
+            <p class="lazy-image-demo__info-text">
+              <span class="lazy-image-demo__status" data-status="{{ i }}">⏳ Ожидание загрузки...</span>
+            </p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .lazy-image-demo {
+    padding: var(--section-padding, 2rem) var(--page-margin, 1rem);
+    max-width: var(--page-width, 1200px);
+    margin: 0 auto;
+  }
+
+  .lazy-image-demo__header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .lazy-image-demo__title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: var(--color-foreground, #000);
+  }
+
+  .lazy-image-demo__description {
+    font-size: 1.125rem;
+    color: var(--color-foreground, #000);
+    opacity: 0.7;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .lazy-image-demo__container {
+    margin-bottom: 3rem;
+  }
+
+  .lazy-image-demo__grid {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .lazy-image-demo__item {
+    position: relative;
+    width: 100%;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .lazy-image-demo__item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  .lazy-image-demo__badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    font-weight: bold;
+    font-size: 0.875rem;
+    backdrop-filter: blur(10px);
+  }
+
+  .lazy-image-demo__image {
+    width: 100%;
+    display: block;
+  }
+
+  .lazy-image-demo__info {
+    padding: 1rem;
+    background: var(--color-background, #fff);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .lazy-image-demo__info-text {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--color-foreground, #000);
+  }
+
+  .lazy-image-demo__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .lazy-image-demo__status[data-status="loading"] {
+    color: #0066cc;
+  }
+
+  .lazy-image-demo__status[data-status="loaded"] {
+    color: #00aa00;
+  }
+
+  .lazy-image-demo__stats {
+    position: sticky;
+    top: 1rem;
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    padding: 1.5rem 2rem;
+    margin: 0 0 2rem 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    flex-wrap: wrap;
+    transition: box-shadow 0.3s ease;
+  }
+
+  .lazy-image-demo__stats:hover {
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+  }
+
+  .lazy-image-demo__stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .lazy-image-demo__stat-label {
+    font-size: 0.875rem;
+    color: var(--color-foreground, #000);
+    opacity: 0.7;
+  }
+
+  .lazy-image-demo__stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--color-foreground, #000);
+  }
+
+  @media screen and (min-width: 768px) {
+    .lazy-image-demo__grid {
+      gap: 3rem;
+    }
+
+    .lazy-image-demo__title {
+      font-size: 3rem;
+    }
+  }
+{% endstylesheet %}
+
+<script>
+  (function() {
+    const section = document.getElementById('lazy-image-demo-{{ section.id }}');
+    if (!section) return;
+
+    const lazyImages = section.querySelectorAll('lazy-image');
+    const statusElements = section.querySelectorAll('[data-status]');
+    const loadedCounter = section.querySelector('[data-loaded]');
+    const visibleCounter = section.querySelector('[data-visible]');
+    const totalCounter = section.querySelector('[data-total]');
+
+    let loadedCount = 0;
+    let visibleCount = 0;
+
+    const updateStatus = (index, status) => {
+      const statusEl = Array.from(statusElements).find(
+        (el) => el.dataset.status === String(index)
+      );
+      if (statusEl) {
+        statusEl.dataset.status = status;
+        if (status === 'loading') {
+          statusEl.textContent = '🔄 Загрузка...';
+        } else if (status === 'loaded') {
+          statusEl.textContent = '✅ Загружено';
+        }
+      }
+    };
+
+    const updateCounters = () => {
+      if (loadedCounter) {
+        loadedCounter.textContent = loadedCount;
+      }
+      if (visibleCounter) {
+        visibleCounter.textContent = visibleCount;
+      }
+      if (totalCounter) {
+        totalCounter.textContent = lazyImages.length;
+      }
+    };
+
+    const visibilityObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const index = entry.target.dataset.lazyIndex;
+          if (entry.isIntersecting) {
+            visibleCount = Math.max(
+              visibleCount,
+              Array.from(lazyImages).filter((img) => {
+                const rect = img.getBoundingClientRect();
+                return (
+                  rect.top >= 0 &&
+                  rect.left >= 0 &&
+                  rect.bottom <= window.innerHeight &&
+                  rect.right <= window.innerWidth
+                );
+              }).length
+            );
+            updateCounters();
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    lazyImages.forEach((img, index) => {
+      const itemIndex = index + 1;
+
+      img.addEventListener('lazy-image-loaded', () => {
+        loadedCount++;
+        updateStatus(itemIndex, 'loaded');
+        updateCounters();
+      });
+
+      img.addEventListener('load', () => {
+        updateStatus(itemIndex, 'loading');
+      });
+
+      visibilityObserver.observe(img);
+    });
+
+    updateCounters();
+
+    const checkVisible = () => {
+      visibleCount = Array.from(lazyImages).filter((img) => {
+        const rect = img.getBoundingClientRect();
+        return (
+          rect.top >= 0 &&
+          rect.top <= window.innerHeight &&
+          rect.left >= 0 &&
+          rect.left <= window.innerWidth
+        );
+      }).length;
+      updateCounters();
+    };
+
+    window.addEventListener('scroll', checkVisible);
+    window.addEventListener('resize', checkVisible);
+    checkVisible();
+  })();
+</script>
+
+<script src="{{ 'lazy-image.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Lazy Image Demo",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Lazy Loading Demo"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Прокрутите страницу вниз, чтобы увидеть, как изображения загружаются только при появлении в зоне видимости."
+    },
+    {
+      "type": "range",
+      "id": "image_count",
+      "label": "Number of images",
+      "min": 5,
+      "max": 30,
+      "step": 1,
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "image_width",
+      "label": "Image width",
+      "min": 400,
+      "max": 2000,
+      "step": 100,
+      "default": 1200,
+      "unit": "px"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_numbers",
+      "label": "Show image numbers",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "root_margin",
+      "label": "Root margin",
+      "default": "50px",
+      "info": "Distance from viewport before loading starts (e.g., '50px', '100px 0')"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Lazy Image Demo"
+    }
+  ]
+}
+{% endschema %}
+

@@ -15,9 +15,14 @@
   },
   "cart": {
     "checkout": "Checkout",
+    "empty": "Your cart is empty",
+    "total": "Total",
     "title": "Cart",
     "update": "Update",
     "remove": "Remove"
+  },
+  "accessibility": {
+    "close": "Close"
   },
   "customers": {
     "login": {

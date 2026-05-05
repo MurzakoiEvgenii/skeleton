@@ -1,0 +1,23 @@
+.site-header {
+  height: 5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.site-header a {
+  position: relative;
+  text-decoration: none;
+  color: var(--color-foreground);
+}
+
+.site-header svg {
+  width: 2rem;
+}
+
+.site-header .header__menu,
+.site-header .header__icons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}

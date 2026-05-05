@@ -1,0 +1,96 @@
+{% doc %}
+  Renders an animated cart drawer with line items and checkout action.
+
+  @param {string} section_id - Section ID used to build unique accessibility IDs
+{% enddoc %}
+
+<cart-drawer class="cart-drawer" data-empty-cart-text="{{ 'cart.empty' | t | escape }}">
+  <button class="cart-drawer__trigger" type="button" data-cart-drawer-trigger aria-expanded="false">
+    {% if cart.item_count > 0 %}
+      <sup class="cart-drawer__count" data-cart-drawer-count>{{ cart.item_count }}</sup>
+    {% endif %}
+    {{ 'icon-cart.svg' | inline_asset_content }}
+    <span class="cart-drawer__sr-only">{{ 'cart.title' | t }}</span>
+  </button>
+
+  <a class="cart-drawer__noscript-link" href="{{ routes.cart_url }}">
+    {{ 'cart.title' | t }}
+  </a>
+
+  <div class="cart-drawer__overlay" data-cart-drawer-close></div>
+
+  <aside
+    class="cart-drawer__panel"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="CartDrawerTitle-{{ section_id }}"
+    tabindex="-1"
+  >
+    <header class="cart-drawer__header">
+      <h3 class="cart-drawer__title" id="CartDrawerTitle-{{ section_id }}">{{ 'cart.title' | t }}</h3>
+      <button
+        class="cart-drawer__close"
+        type="button"
+        data-cart-drawer-close
+        aria-label="{{ 'accessibility.close' | t }}"
+      >
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </header>
+
+    <div class="cart-drawer__body" data-cart-drawer-items>
+      {% if cart.item_count == 0 %}
+        <p class="cart-drawer__empty">{{ 'cart.empty' | t }}</p>
+      {% else %}
+        <ul class="cart-drawer__list">
+          {% for item in cart.items %}
+            <li class="cart-drawer__item">
+              <a class="cart-drawer__item-image-link" href="{{ item.url }}">
+                {% if item.image %}
+                  {{
+                    item.image
+                    | image_url: width: 160, height: 160, crop: 'center'
+                    | image_tag: class: 'cart-drawer__item-image', loading: 'lazy', alt: item.title
+                  }}
+                {% endif %}
+              </a>
+
+              <div class="cart-drawer__item-content">
+                <p class="cart-drawer__item-title">{{ item.product.title }}</p>
+                <p class="cart-drawer__item-price">{{ item.final_line_price | money }}</p>
+              </div>
+
+              <button
+                class="cart-drawer__remove"
+                type="button"
+                data-cart-drawer-remove
+                data-line="{{ item.index | plus: 1 }}"
+                aria-label="{{ 'cart.remove' | t }}"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path
+                    d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 7h2v8h-2v-8zm4 0h2v8h-2v-8zM8 10h2v8H8v-8z"
+                    fill="currentColor"
+                  ></path>
+                </svg>
+              </button>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+
+    <footer class="cart-drawer__footer">
+      <p class="cart-drawer__total-row">
+        <span>{{ 'cart.total' | t }}</span>
+        <strong data-cart-drawer-total>{{ cart.total_price | money }}</strong>
+      </p>
+
+      <form action="{{ routes.cart_url }}" method="post">
+        <button class="cart-drawer__checkout button" type="submit" name="checkout">
+          {{ 'cart.checkout' | t }}
+        </button>
+      </form>
+    </footer>
+  </aside>
+</cart-drawer>
