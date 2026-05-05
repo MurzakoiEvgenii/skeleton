@@ -1,0 +1,229 @@
+.cart-drawer {
+  --cart-drawer-width: min(92vw, 28rem);
+  --cart-drawer-gap: 1rem;
+  --cart-drawer-border: color-mix(in srgb, var(--color-foreground) 12%, transparent);
+  --cart-drawer-overlay: rgb(0 0 0 / 45%);
+  --cart-drawer-duration: 260ms;
+  --cart-drawer-easing: cubic-bezier(0.2, 0.7, 0.3, 1);
+
+  position: relative;
+}
+
+.cart-drawer__sr-only {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+.cart-drawer__trigger {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-foreground);
+  cursor: pointer;
+}
+
+.cart-drawer__trigger svg {
+  width: 2rem;
+  height: 2rem;
+}
+
+.cart-drawer__count {
+  position: absolute;
+  top: -0.45rem;
+  right: -0.55rem;
+  min-width: 1.2rem;
+  border-radius: 999px;
+  padding: 0.1rem 0.32rem;
+  font-size: 0.72rem;
+  line-height: 1;
+  background-color: var(--color-foreground);
+  color: var(--color-background);
+}
+
+.cart-drawer__noscript-link {
+  display: none;
+}
+
+.cart-drawer__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 49;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--cart-drawer-duration) var(--cart-drawer-easing),
+    visibility var(--cart-drawer-duration) var(--cart-drawer-easing);
+  background: var(--cart-drawer-overlay);
+}
+
+.cart-drawer__panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 50;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  width: var(--cart-drawer-width);
+  height: 100svh;
+  padding: 1rem;
+  transform: translateX(102%);
+  visibility: hidden;
+  transition:
+    transform var(--cart-drawer-duration) var(--cart-drawer-easing),
+    visibility var(--cart-drawer-duration) var(--cart-drawer-easing);
+  border-left: 1px solid var(--cart-drawer-border);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  gap: var(--cart-drawer-gap);
+}
+
+.cart-drawer[open] .cart-drawer__overlay {
+  opacity: 1;
+  visibility: visible;
+}
+
+.cart-drawer[open] .cart-drawer__panel {
+  transform: translateX(0);
+  visibility: visible;
+}
+
+.cart-drawer__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--cart-drawer-border);
+  padding-bottom: 0.7rem;
+}
+
+.cart-drawer__title {
+  font-size: 1.15rem;
+}
+
+.cart-drawer__close {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.cart-drawer__body {
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.cart-drawer__empty {
+  color: color-mix(in srgb, var(--color-foreground) 70%, transparent);
+}
+
+.cart-drawer__list {
+  list-style: none;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.cart-drawer__item {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr auto;
+  align-items: center;
+  gap: 0.8rem;
+  border-bottom: 1px solid var(--cart-drawer-border);
+  padding-bottom: 0.9rem;
+}
+
+.cart-drawer__item-image-link {
+  display: block;
+  width: 4.5rem;
+}
+
+.cart-drawer__item-image {
+  width: 4.5rem;
+  height: 4.5rem;
+  object-fit: cover;
+}
+
+.cart-drawer__item-content {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.cart-drawer__item-title {
+  font-size: 0.95rem;
+}
+
+.cart-drawer__item-price {
+  font-weight: 600;
+}
+
+.cart-drawer__remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.cart-drawer__remove svg {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.cart-drawer__footer {
+  border-top: 1px solid var(--cart-drawer-border);
+  padding-top: 0.9rem;
+  display: grid;
+  gap: 0.8rem;
+}
+
+.cart-drawer__total-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cart-drawer__checkout {
+  width: 100%;
+  min-height: 2.8rem;
+  border: 0;
+  background-color: var(--color-foreground);
+  color: var(--color-background);
+  cursor: pointer;
+}
+
+html:has(.cart-drawer[open]) {
+  overflow: hidden;
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+  .cart-drawer__overlay,
+  .cart-drawer__panel {
+    transition: none;
+  }
+}
+
+@media screen and (scripting: none) {
+  .cart-drawer__trigger,
+  .cart-drawer__overlay,
+  .cart-drawer__panel {
+    display: none;
+  }
+
+  .cart-drawer__noscript-link {
+    display: inline-flex;
+  }
+}
